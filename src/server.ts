@@ -15,14 +15,14 @@ import {
   getAllPositions,
   openTrade,
   closeTrade,
-  IDL
+  IDL,
 } from 'lavarage-sdk';
 
 const app = express();
 
 app.use(bodyParser.json());
-
-function initProgram(): Program<typeof IDL> {
+const PROGRAM_IDS = ['CRSeeBqjDnm3UPefJ9gxrtngTsnQRhEJiTA345Q83X3v', '1avaAUcjccXCjSZzwUvB2gS3DzkkieV2Mw8CjdN65uu']
+function initProgram(programId = PROGRAM_IDS[0]): Program<typeof IDL> {
     const connection = new Connection('https://solana-mainnet.g.alchemy.com/v2/yTBaNPPya9CJDsgBHq-dg89gpjzbFzbQ', {
         wsEndpoint: 'wss://solana-mainnet.core.chainstack.com/ws/8cde996495659fabe0b76a1eb576a995',
         commitment: 'confirmed',
@@ -34,10 +34,15 @@ function initProgram(): Program<typeof IDL> {
         preflightCommitment: 'finalized',
     })
 
-    return new Program(IDL, 'CRSeeBqjDnm3UPefJ9gxrtngTsnQRhEJiTA345Q83X3v', provider)
+    return new Program(IDL, programId, provider)
+}
+
+function initPrograms(): Program<typeof IDL>[] {
+    return PROGRAM_IDS.map(initProgram)
 }
 
 const lavarageProgram = initProgram()
+const lavaragePrograms = initPrograms()
 
 const openApiDefinition: OpenAPIV3.Document = {
   openapi: '3.0.0',
@@ -138,6 +143,26 @@ const openApiDefinition: OpenAPIV3.Document = {
         responses: {
           '200': {
             description: 'A list of all positions',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    '/api/sdk/v0.2/positions': {
+      get: {
+        summary: 'Get all positions for all programs',
+        responses: {
+          '200': {
+            description: 'A list of all positions for all programs',
             content: {
               'application/json': {
                 schema: {
@@ -301,6 +326,17 @@ app.get('/api/sdk/v0.1/positions/liquidated', async (req, res) => {
 app.get('/api/sdk/v0.1/positions', async (req, res) => {
   try {
     const positions = await getAllPositions(lavarageProgram);
+    res.json(positions);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.get('/api/sdk/v0.2/positions', async (req, res) => {
+  try {
+    const positions_0 = await getAllPositions(lavaragePrograms[0]);
+    const positions_1 = await getAllPositions(lavaragePrograms[1]);
+    // const positions = positions_0.concat(positions_1)
+    const positions = positions_1
     res.json(positions);
   } catch (err: any) {
     res.status(500).json({ error: err.message });
