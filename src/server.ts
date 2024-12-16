@@ -1,12 +1,8 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor';
-import {
-  Keypair,
-  PublicKey,
-  Connection
-} from '@solana/web3.js';
-import { OpenAPIV3 } from 'openapi-types';
+import express from "express";
+import bodyParser from "body-parser";
+import { AnchorProvider, BN, Program, Wallet } from "@coral-xyz/anchor";
+import { Keypair, PublicKey, Connection } from "@solana/web3.js";
+import { OpenAPIV3 } from "openapi-types";
 import {
   getOffers,
   getOpenPositions,
@@ -15,230 +11,244 @@ import {
   getAllPositions,
   openTrade,
   closeTrade,
-  IDL
-} from 'lavarage-sdk';
+  IDL,
+} from "lavarage-sdk";
 
 const app = express();
+console.log("none");
 
 app.use(bodyParser.json());
 
 function initProgram(): Program<typeof IDL> {
-    const connection = new Connection('https://solana-mainnet.g.alchemy.com/v2/yTBaNPPya9CJDsgBHq-dg89gpjzbFzbQ', {
-        wsEndpoint: 'wss://solana-mainnet.core.chainstack.com/ws/8cde996495659fabe0b76a1eb576a995',
-        commitment: 'confirmed',
-    })
+  const connection = new Connection(
+    "https://solana-mainnet.g.alchemy.com/v2/yTBaNPPya9CJDsgBHq-dg89gpjzbFzbQ",
+    {
+      wsEndpoint:
+        "wss://solana-mainnet.core.chainstack.com/ws/8cde996495659fabe0b76a1eb576a995",
+      commitment: "confirmed",
+    }
+  );
 
-    const wallet = new Wallet(Keypair.generate())
+  const wallet = new Wallet(Keypair.generate());
 
-    const provider = new AnchorProvider(connection, wallet, {
-        preflightCommitment: 'finalized',
-    })
+  const provider = new AnchorProvider(connection, wallet, {
+    preflightCommitment: "finalized",
+  });
 
-    return new Program(IDL, 'CRSeeBqjDnm3UPefJ9gxrtngTsnQRhEJiTA345Q83X3v', provider)
+  return new Program(
+    IDL,
+    "CRSeeBqjDnm3UPefJ9gxrtngTsnQRhEJiTA345Q83X3v",
+    provider
+  );
 }
 
-const lavarageProgram = initProgram()
+const lavarageProgram = initProgram();
 
 const openApiDefinition: OpenAPIV3.Document = {
-  openapi: '3.0.0',
+  openapi: "3.0.0",
   info: {
-    title: 'Lavarage API',
-    version: '1.0.0',
-    description: 'API documentation for Lavarage SDK methods',
+    title: "Lavarage API",
+    version: "1.0.0",
+    description: "API documentation for Lavarage SDK methods",
   },
   servers: [
     {
-      url: 'https://partner-api.lavarave.wtf',
+      url: "https://partner-api.lavarave.wtf",
     },
   ],
   paths: {
-    '/api/sdk/v0.1/offers': {
+    "/api/sdk/v0.1/offers": {
       get: {
-        summary: 'Get all offers',
+        summary: "Get all offers",
         responses: {
-          '200': {
-            description: 'A list of offers',
+          "200": {
+            description: "A list of offers",
             content: {
-              'application/json': {
+              "application/json": {
                 schema: {
-                  type: 'array',
+                  type: "array",
                   items: {
-                    type: 'object',
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    type: "object",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
-    '/api/sdk/v0.1/positions/open': {
+    "/api/sdk/v0.1/positions/open": {
       get: {
-        summary: 'Get open positions',
+        summary: "Get open positions",
         responses: {
-          '200': {
-            description: 'A list of open positions',
+          "200": {
+            description: "A list of open positions",
             content: {
-              'application/json': {
+              "application/json": {
                 schema: {
-                  type: 'array',
+                  type: "array",
                   items: {
-                    type: 'object',
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    type: "object",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
-    '/api/sdk/v0.1/positions/closed': {
+    "/api/sdk/v0.1/positions/closed": {
       get: {
-        summary: 'Get closed positions',
+        summary: "Get closed positions",
         responses: {
-          '200': {
-            description: 'A list of closed positions',
+          "200": {
+            description: "A list of closed positions",
             content: {
-              'application/json': {
+              "application/json": {
                 schema: {
-                  type: 'array',
+                  type: "array",
                   items: {
-                    type: 'object',
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    type: "object",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
-    '/api/sdk/v0.1/positions/liquidated': {
+    "/api/sdk/v0.1/positions/liquidated": {
       get: {
-        summary: 'Get liquidated positions',
+        summary: "Get liquidated positions",
         responses: {
-          '200': {
-            description: 'A list of liquidated positions',
+          "200": {
+            description: "A list of liquidated positions",
             content: {
-              'application/json': {
+              "application/json": {
                 schema: {
-                  type: 'array',
+                  type: "array",
                   items: {
-                    type: 'object',
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    type: "object",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
-    '/api/sdk/v0.1/positions': {
+    "/api/sdk/v0.1/positions": {
       get: {
-        summary: 'Get all positions',
+        summary: "Get all positions",
         responses: {
-          '200': {
-            description: 'A list of all positions',
+          "200": {
+            description: "A list of all positions",
             content: {
-              'application/json': {
+              "application/json": {
                 schema: {
-                  type: 'array',
+                  type: "array",
                   items: {
-                    type: 'object',
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    type: "object",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
-    '/api/sdk/v0.1/trades/open': {
+    "/api/sdk/v0.1/trades/open": {
       post: {
-        summary: 'Open a trade',
+        summary: "Open a trade",
         requestBody: {
           required: true,
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                type: 'object',
+                type: "object",
                 properties: {
-                  offerId: { type: 'string' },
-                  jupInstruction: { type: 'object' },
-                  marginSOL: { type: 'string' },
-                  leverage: { type: 'number' },
-                  partnerFeeRecipient: { type: 'string' }
+                  offerId: { type: "string" },
+                  jupInstruction: { type: "object" },
+                  marginSOL: { type: "string" },
+                  leverage: { type: "number" },
+                  partnerFeeRecipient: { type: "string" },
                 },
-                required: ['offerId', 'jupInstruction', 'marginSOL', 'leverage']
-              }
-            }
-          }
+                required: [
+                  "offerId",
+                  "jupInstruction",
+                  "marginSOL",
+                  "leverage",
+                ],
+              },
+            },
+          },
         },
         responses: {
-          '200': {
-            description: 'The opened trade transaction',
+          "200": {
+            description: "The opened trade transaction",
             content: {
-              'application/json': {
+              "application/json": {
                 schema: {
-                  type: 'object',
+                  type: "object",
                   properties: {
-                    transaction: { type: 'string' }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    transaction: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
-    '/api/sdk/v0.1/trades/close': {
+    "/api/sdk/v0.1/trades/close": {
       post: {
-        summary: 'Close a trade',
+        summary: "Close a trade",
         requestBody: {
           required: true,
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                type: 'object',
+                type: "object",
                 properties: {
-                  positionId: { type: 'string' },
-                  offerId: { type: 'string' },
-                  jupInstruction: { type: 'object' },
-                  partnerFeeRecipient: { type: 'string' },
-                  profitFeeMarkup: { type: 'number' }
+                  positionId: { type: "string" },
+                  offerId: { type: "string" },
+                  jupInstruction: { type: "object" },
+                  partnerFeeRecipient: { type: "string" },
+                  profitFeeMarkup: { type: "number" },
                 },
-                required: ['positionId', 'offerId', 'jupInstruction']
-              }
-            }
-          }
+                required: ["positionId", "offerId", "jupInstruction"],
+              },
+            },
+          },
         },
         responses: {
-          '200': {
-            description: 'The closed trade transaction',
+          "200": {
+            description: "The closed trade transaction",
             content: {
-              'application/json': {
+              "application/json": {
                 schema: {
-                  type: 'object',
+                  type: "object",
                   properties: {
-                    transaction: { type: 'string' }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    transaction: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
 };
 
 // Serve the OpenAPI specification at /api/sdk/v0.1/openapi.json
-app.get('/api/sdk/v0.1/openapi.json', (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
+app.get("/api/sdk/v0.1/openapi.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
   res.send(openApiDefinition);
 });
 
 // Serve the OpenAPI documentation using Redoc
-app.get('/api/sdk/v0.1/docs', (req, res) => {
+app.get("/api/sdk/v0.1/docs", (req, res) => {
   res.send(`
 <!DOCTYPE html>
 <html>
@@ -262,7 +272,7 @@ app.get('/api/sdk/v0.1/docs', (req, res) => {
 });
 
 // API Endpoints
-app.get('/api/sdk/v0.1/offers', async (req, res) => {
+app.get("/api/sdk/v0.1/offers", async (req, res) => {
   try {
     const offers = await getOffers(lavarageProgram);
     res.json(offers);
@@ -271,7 +281,7 @@ app.get('/api/sdk/v0.1/offers', async (req, res) => {
   }
 });
 
-app.get('/api/sdk/v0.1/positions/open', async (req, res) => {
+app.get("/api/sdk/v0.1/positions/open", async (req, res) => {
   try {
     const positions = await getOpenPositions(lavarageProgram);
     res.json(positions);
@@ -280,7 +290,7 @@ app.get('/api/sdk/v0.1/positions/open', async (req, res) => {
   }
 });
 
-app.get('/api/sdk/v0.1/positions/closed', async (req, res) => {
+app.get("/api/sdk/v0.1/positions/closed", async (req, res) => {
   try {
     const positions = await getClosedPositions(lavarageProgram);
     res.json(positions);
@@ -289,7 +299,7 @@ app.get('/api/sdk/v0.1/positions/closed', async (req, res) => {
   }
 });
 
-app.get('/api/sdk/v0.1/positions/liquidated', async (req, res) => {
+app.get("/api/sdk/v0.1/positions/liquidated", async (req, res) => {
   try {
     const positions = await getLiquidatedPositions(lavarageProgram);
     res.json(positions);
@@ -298,7 +308,7 @@ app.get('/api/sdk/v0.1/positions/liquidated', async (req, res) => {
   }
 });
 
-app.get('/api/sdk/v0.1/positions', async (req, res) => {
+app.get("/api/sdk/v0.1/positions", async (req, res) => {
   try {
     const positions = await getAllPositions(lavarageProgram);
     res.json(positions);
@@ -307,14 +317,15 @@ app.get('/api/sdk/v0.1/positions', async (req, res) => {
   }
 });
 
-app.post('/api/sdk/v0.1/trades/open', async (req, res) => {
-  const { offerId, jupInstruction, marginSOL, leverage, partnerFeeRecipient } = req.body;
+app.post("/api/sdk/v0.1/trades/open", async (req, res) => {
+  const { offerId, jupInstruction, marginSOL, leverage, partnerFeeRecipient } =
+    req.body;
   try {
     const offers = await getOffers(lavarageProgram);
-    const offer = offers.find(o => offerId === o.publicKey.toBase58());
+    const offer = offers.find((o) => offerId === o.publicKey.toBase58());
 
     if (!offer) {
-      throw new Error('No offer found with pubkey ' + offerId);
+      throw new Error("No offer found with pubkey " + offerId);
     }
 
     const randomSeed = Keypair.generate();
@@ -334,21 +345,29 @@ app.post('/api/sdk/v0.1/trades/open', async (req, res) => {
   }
 });
 
-app.post('/api/sdk/v0.1/trades/close', async (req, res) => {
-  const { positionId, offerId, jupInstruction, partnerFeeRecipient, profitFeeMarkup } = req.body;
+app.post("/api/sdk/v0.1/trades/close", async (req, res) => {
+  const {
+    positionId,
+    offerId,
+    jupInstruction,
+    partnerFeeRecipient,
+    profitFeeMarkup,
+  } = req.body;
   try {
     const positions = await getAllPositions(lavarageProgram);
-    const position = positions.find(p => positionId === p.publicKey.toBase58());
+    const position = positions.find(
+      (p) => positionId === p.publicKey.toBase58()
+    );
 
     if (!position) {
-      throw new Error('No position found with pubkey ' + positionId);
+      throw new Error("No position found with pubkey " + positionId);
     }
 
     const offers = await getOffers(lavarageProgram);
-    const offer = offers.find(o => offerId === o.publicKey.toBase58());
+    const offer = offers.find((o) => offerId === o.publicKey.toBase58());
 
     if (!offer) {
-      throw new Error('No offer found with pubkey ' + offerId);
+      throw new Error("No offer found with pubkey " + offerId);
     }
 
     const tx = await closeTrade(
@@ -366,5 +385,5 @@ app.post('/api/sdk/v0.1/trades/close', async (req, res) => {
 });
 
 app.listen(3000, () => {
-  console.log('Server started on port 3000');
+  console.log("Server started on port 3000");
 });
