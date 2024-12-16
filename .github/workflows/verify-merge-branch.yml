@@ -1,0 +1,15 @@
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+
+jobs:
+  check-source-branch:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.base.ref == 'main' }}
+    steps:
+      - name: Check if PR is from staging
+        run: |
+          if [ "${{ github.event.pull_request.head.ref }}" != "staging" ]; then
+            echo "This PR is not coming from the staging branch."
+            exit 1
+          fi
