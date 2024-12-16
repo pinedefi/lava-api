@@ -15,7 +15,6 @@ import {
 } from "lavarage-sdk";
 
 const app = express();
-console.log("none");
 
 app.use(bodyParser.json());
 
