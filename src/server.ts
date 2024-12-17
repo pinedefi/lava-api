@@ -1,12 +1,7 @@
-import express from 'express';
-import bodyParser from 'body-parser';
 import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor';
-import {
-  Keypair,
-  PublicKey,
-  Connection
-} from '@solana/web3.js';
-import { OpenAPIV3 } from 'openapi-types';
+import { Keypair, PublicKey, Connection } from '@solana/web3.js';
+import bodyParser from 'body-parser';
+import express from 'express';
 import {
   getOffers,
   getOpenPositions,
@@ -15,29 +10,30 @@ import {
   getAllPositions,
   openTrade,
   closeTrade,
-  IDL
+  IDL,
 } from 'lavarage-sdk';
+import { OpenAPIV3 } from 'openapi-types';
 
 const app = express();
 
 app.use(bodyParser.json());
 
 function initProgram(): Program<typeof IDL> {
-    const connection = new Connection('https://solana-mainnet.g.alchemy.com/v2/yTBaNPPya9CJDsgBHq-dg89gpjzbFzbQ', {
-        wsEndpoint: 'wss://solana-mainnet.core.chainstack.com/ws/8cde996495659fabe0b76a1eb576a995',
-        commitment: 'confirmed',
-    })
+  const connection = new Connection('https://solana-mainnet.g.alchemy.com/v2/yTBaNPPya9CJDsgBHq-dg89gpjzbFzbQ', {
+    wsEndpoint: 'wss://solana-mainnet.core.chainstack.com/ws/8cde996495659fabe0b76a1eb576a995',
+    commitment: 'confirmed',
+  });
 
-    const wallet = new Wallet(Keypair.generate())
+  const wallet = new Wallet(Keypair.generate());
 
-    const provider = new AnchorProvider(connection, wallet, {
-        preflightCommitment: 'finalized',
-    })
+  const provider = new AnchorProvider(connection, wallet, {
+    preflightCommitment: 'finalized',
+  });
 
-    return new Program(IDL, 'CRSeeBqjDnm3UPefJ9gxrtngTsnQRhEJiTA345Q83X3v', provider)
+  return new Program(IDL, 'CRSeeBqjDnm3UPefJ9gxrtngTsnQRhEJiTA345Q83X3v', provider);
 }
 
-const lavarageProgram = initProgram()
+const lavarageProgram = initProgram();
 
 const openApiDefinition: OpenAPIV3.Document = {
   openapi: '3.0.0',
@@ -64,13 +60,13 @@ const openApiDefinition: OpenAPIV3.Document = {
                   type: 'array',
                   items: {
                     type: 'object',
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     '/api/sdk/v0.1/positions/open': {
       get: {
@@ -84,13 +80,13 @@ const openApiDefinition: OpenAPIV3.Document = {
                   type: 'array',
                   items: {
                     type: 'object',
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     '/api/sdk/v0.1/positions/closed': {
       get: {
@@ -104,13 +100,13 @@ const openApiDefinition: OpenAPIV3.Document = {
                   type: 'array',
                   items: {
                     type: 'object',
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     '/api/sdk/v0.1/positions/liquidated': {
       get: {
@@ -124,13 +120,13 @@ const openApiDefinition: OpenAPIV3.Document = {
                   type: 'array',
                   items: {
                     type: 'object',
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     '/api/sdk/v0.1/positions': {
       get: {
@@ -144,13 +140,13 @@ const openApiDefinition: OpenAPIV3.Document = {
                   type: 'array',
                   items: {
                     type: 'object',
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     '/api/sdk/v0.1/trades/open': {
       post: {
@@ -166,12 +162,12 @@ const openApiDefinition: OpenAPIV3.Document = {
                   jupInstruction: { type: 'object' },
                   marginSOL: { type: 'string' },
                   leverage: { type: 'number' },
-                  partnerFeeRecipient: { type: 'string' }
+                  partnerFeeRecipient: { type: 'string' },
                 },
-                required: ['offerId', 'jupInstruction', 'marginSOL', 'leverage']
-              }
-            }
-          }
+                required: ['offerId', 'jupInstruction', 'marginSOL', 'leverage'],
+              },
+            },
+          },
         },
         responses: {
           '200': {
@@ -181,14 +177,14 @@ const openApiDefinition: OpenAPIV3.Document = {
                 schema: {
                   type: 'object',
                   properties: {
-                    transaction: { type: 'string' }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    transaction: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     '/api/sdk/v0.1/trades/close': {
       post: {
@@ -204,12 +200,12 @@ const openApiDefinition: OpenAPIV3.Document = {
                   offerId: { type: 'string' },
                   jupInstruction: { type: 'object' },
                   partnerFeeRecipient: { type: 'string' },
-                  profitFeeMarkup: { type: 'number' }
+                  profitFeeMarkup: { type: 'number' },
                 },
-                required: ['positionId', 'offerId', 'jupInstruction']
-              }
-            }
-          }
+                required: ['positionId', 'offerId', 'jupInstruction'],
+              },
+            },
+          },
         },
         responses: {
           '200': {
@@ -219,14 +215,14 @@ const openApiDefinition: OpenAPIV3.Document = {
                 schema: {
                   type: 'object',
                   properties: {
-                    transaction: { type: 'string' }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    transaction: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
 };
@@ -326,7 +322,7 @@ app.post('/api/sdk/v0.1/trades/open', async (req, res) => {
       new BN(marginSOL),
       leverage,
       randomSeed,
-      partnerFeeRecipient ? new PublicKey(partnerFeeRecipient) : undefined
+      partnerFeeRecipient ? new PublicKey(partnerFeeRecipient) : undefined,
     );
     res.json({ transaction: tx });
   } catch (err: any) {
@@ -357,7 +353,7 @@ app.post('/api/sdk/v0.1/trades/close', async (req, res) => {
       offer,
       jupInstruction,
       partnerFeeRecipient ? new PublicKey(partnerFeeRecipient) : undefined,
-      profitFeeMarkup
+      profitFeeMarkup,
     );
     res.json({ transaction: tx });
   } catch (err: any) {
